@@ -155,6 +155,15 @@ def run(binary):
                         c.until(214)
                         c.close()
 
+                        # A legacy client can send a socket test as its first
+                        # frame and then log in with data port 0 (firewalled).
+                        c = client(order)
+                        c.sock.sendall(frame(order, 920, b"62") +
+                                       frame(order, 2, login_body("new" + suffix)))
+                        assert c.receive()[0] == 3
+                        c.until(214)
+                        c.close()
+
                         # Direct command 2, without a preceding version check.
                         c = client(order)
                         c.send(2, login_body("direct" + suffix))

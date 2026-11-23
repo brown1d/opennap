@@ -18,7 +18,7 @@ The metaserver redirect to 172.16.1.39:8888 succeeds in the capture.
 Behavior
 --------
 Each connection selects its header byte order from the first complete
-four-byte header. Initial client commands 2, 4, 6, 7, 11 and 300 distinguish
+four-byte header. Initial client commands 2, 4, 6, 7, 11, 300 and 920 distinguish
 the two orders. Unknown or ambiguous initial headers retain the historical
 little-endian interpretation and normal validation. Detection does not relax
 the command-length limit or reinterpret an oversized message as another order.
@@ -33,6 +33,8 @@ version in the same byte order. This acknowledges that no update is needed.
 The server logs version checks other than the captured Beta 10.3 and 10.4
 strings. An unfamiliar version still receives the same acknowledgement and
 can proceed to normal login or registration.
+The server accepts the legacy pre-login socket test (command 920) without
+performing a network probe. Login still requires the normal login command.
 
 Internal frames and server-to-server links remain little-endian. A big-endian
 client cannot switch into the compressed peer-server protocol. This patch
