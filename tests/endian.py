@@ -111,8 +111,14 @@ def run(binary):
 
                     for order, suffix in (("<", "le"), (">", "be")):
                         c = client(order)
-                        # The captured BE version check starts 00 10 00 04.
-                        c.send(4, '"v2.0 BETA 10.4"', fragmented=True)
+                        # Wait for the version reply before proceeding, as
+                        # the Windows client does on its first connection.
+                        for version in (b'"v2.0 BETA 10.3"', b'"v2.0 BETA 10.4"'):
+                            c.send(4, version, fragmented=True)
+                            assert c.receive() == (4, version)
+                        unfamiliar = b'"v2.0 TEST BUILD"'
+                        c.send(4, unfamiliar)
+                        assert c.receive() == (4, unfamiliar)
                         c.send(7, "new" + suffix, fragmented=True)
                         assert c.receive() == (8, b"")
                         c.send(6, login_body("new" + suffix), fragmented=True)
@@ -164,7 +170,7 @@ def run(binary):
                         # At the length limit is accepted; one byte over closes
                         # immediately, without waiting for a declared body.
                         c = client(order)
-                        c.send(4, b"x" * 2048)
+                        c.send(300, b"x" * 2048)
                         c.send(7, "unused")
                         assert c.receive() == (8, b"")
                         c.sock.sendall(struct.pack(order + "HH", 2049, 4))
@@ -225,6 +231,8 @@ def run(binary):
                 except subprocess.TimeoutExpired:
                     process.kill()
                     process.wait()
+            log.seek(0)
+            assert log.read().count("version_check(): unknown client version") == 2
     print("all endian integration tests passed")
 
 

@@ -37,13 +37,20 @@ initial_client_command (unsigned short tag)
         tag == MSG_CLIENT_CHECK_PASS || tag == MSG_CLIENT_CHECK_PORT;
 }
 
-/* 4: version check.  No upgrade is required by this server. */
+/* 4: acknowledge the client's version before login. */
 static HANDLER (version_check)
 {
-    (void) con;
-    (void) tag;
-    (void) len;
-    (void) pkt;
+    if (ISUNKNOWN (con) && !con->server_login)
+    {
+	static const char beta103[] = "\"v2.0 BETA 10.3\"";
+	static const char beta104[] = "\"v2.0 BETA 10.4\"";
+
+	if (!(len == sizeof (beta103) - 1 && !memcmp (pkt, beta103, len)) &&
+	    !(len == sizeof (beta104) - 1 && !memcmp (pkt, beta104, len)))
+	    log ("version_check(): unknown client version from %s (%hu bytes)",
+	         con->host, len);
+	send_cmd (con, tag, "%.*s", (int) len, pkt);
+    }
 }
 
 /* 214 */

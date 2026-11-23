@@ -28,7 +28,11 @@ Only header fields are converted. Payloads, passwords, strings and decimal
 IP fields retain their original bytes. Output conversion happens for each
 recipient, on a private copy, and supports multiple concatenated frames.
 This covers normal replies, shared chat/statistics buffers and batched MOTD.
-Command 4 is accepted silently instead of generating an unknown-command reply.
+Before login, command 4 receives a command 4 reply carrying the reported
+version in the same byte order. This acknowledges that no update is needed.
+The server logs version checks other than the captured Beta 10.3 and 10.4
+strings. An unfamiliar version still receives the same acknowledgement and
+can proceed to normal login or registration.
 
 Internal frames and server-to-server links remain little-endian. A big-endian
 client cannot switch into the compressed peer-server protocol. This patch
