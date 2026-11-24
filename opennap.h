@@ -583,6 +583,7 @@ void set_val (char *d, unsigned short val);
 #define MSG_CLIENT_GLOBAL_USER_LIST	831
 #define MSG_SERVER_GLOBAL_USER_LIST	832
 #define MSG_CLIENT_ADD_DIRECTORY	870
+#define MSG_CLIENT_SOCKET_TEST		920
 
 /* non-standard message unique to this server */
 #define MSG_CLIENT_QUIT			10000	/* user has quit */

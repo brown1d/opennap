@@ -34,16 +34,24 @@ initial_client_command (unsigned short tag)
 {
     return tag == MSG_CLIENT_LOGIN || tag == 4 ||
         tag == MSG_CLIENT_LOGIN_REGISTER || tag == MSG_CLIENT_REGISTER ||
-        tag == MSG_CLIENT_CHECK_PASS || tag == MSG_CLIENT_CHECK_PORT;
+        tag == MSG_CLIENT_CHECK_PASS || tag == MSG_CLIENT_CHECK_PORT ||
+        tag == MSG_CLIENT_SOCKET_TEST;
 }
 
-/* 4: version check.  No upgrade is required by this server. */
+/* 4: acknowledge the client's version before login. */
 static HANDLER (version_check)
 {
-    (void) con;
-    (void) tag;
-    (void) len;
-    (void) pkt;
+    if (ISUNKNOWN (con) && !con->server_login)
+    {
+	static const char beta103[] = "\"v2.0 BETA 10.3\"";
+	static const char beta104[] = "\"v2.0 BETA 10.4\"";
+
+	if (!(len == sizeof (beta103) - 1 && !memcmp (pkt, beta103, len)) &&
+	    !(len == sizeof (beta104) - 1 && !memcmp (pkt, beta104, len)))
+	    log ("version_check(): unknown client version from %s (%hu bytes)",
+	         con->host, len);
+	send_cmd (con, tag, "%.*s", (int) len, pkt);
+    }
 }
 
 /* 214 */
@@ -200,6 +208,7 @@ static HANDLER Protocol[] = {
     {MSG_CLIENT_NAMES_LIST, list_users},	/* 830 */
     {MSG_CLIENT_GLOBAL_USER_LIST, global_user_list},	/* 831 */
     {MSG_CLIENT_ADD_DIRECTORY, add_directory},	/* 870 */
+    {MSG_CLIENT_SOCKET_TEST, check_port},	/* 920: ignore like the port check */
 
     /* non-standard messages */
     {MSG_CLIENT_QUIT, client_quit},	/* 10000 */
@@ -505,7 +514,7 @@ handle_connection (CONNECTION * con)
 	     tag != MSG_CLIENT_REGISTER && tag != MSG_SERVER_LOGIN &&
 	     tag != MSG_SERVER_LOGIN_ACK && tag != MSG_SERVER_ERROR &&
 	     tag != 4 &&	/* unknown: v2.0 beta 5a sends this? */
-	     tag != 300 && tag != 11))
+	     tag != 300 && tag != 11 && tag != MSG_CLIENT_SOCKET_TEST))
 	{
 	    log ("handle_connection(): %s is not registered", con->host);
 	    *(con->recvbuf->data + con->recvbuf->consumed + 4 + len) = 0;
