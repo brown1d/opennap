@@ -1,0 +1,16 @@
+.uberhead { font-family: Arial, Helvetica, Sans-Serif, Times; font-size: 180%; }
+.head { font-family: Arial, Helvetica, Sans-Serif, Times; font-size: 130%; }
+.subhead { font-family: Arial, Helvetica, Sans-Serif, Times; font-size: 120%; }
+.bodytext { font-family: Arial, Helvetica, Sans-Serif, Times; font-size: 90%; }
+.smbodytext { font-family: Arial, Helvetica, Sans-Serif, Times; font-size: 70%; }
+.xsmbodytext { font-family: Arial, Helvetica, Sans-Serif, Times; font-size: 60%; }
+.tabon { font-family : Arial, Helvetica, sans-serif; font-size: 11pt; font-weight : bold; }
+.taboff { font-family : Arial, Helvetica, sans-serif; font-size: 11pt; }
+
+A:ACTIVE { font-family : Arial, Helvetica, sans-serif; color : #660A0A; }
+A:LINK { font-family : Arial, Helvetica, sans-serif; color : #660A0A; }
+A:VISITED { font-family : Arial, Helvetica, sans-serif; color : #660A0A; }
+A:HOVER { font-family : Arial, Helvetica, sans-serif; color : #660A0A; }
+
+A.naplink:ACTIVE, A.naplink:LINK, A.naplink:VISITED, A.naplink:HOVER { color: #17630B; font-weight: bold;}
+A.whitelink:ACTIVE, A.whitelink:LINK, A.whitelink:VISITED, A.whitelink:HOVER { color: #ffffff;}
